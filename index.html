@@ -3,28 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>樂團歌曲清單</title>
+  <title>樂團演出歌曲清單</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-gray-100 font-sans">
-  <div class="max-w-5xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold text-center mb-6">🎶 樂團演出歌曲清單</h1>
+<body class="bg-[#F9F5F0] px-4 py-10 text-lg">
 
-    <div id="loading" class="text-center text-gray-500 mb-4">📡 載入中...</div>
+  <div class="max-w-5xl mx-auto text-center">
 
-    <table class="table-auto w-full bg-white shadow rounded overflow-hidden text-sm">
-      <thead class="bg-gray-200">
-        <tr>
-          <th class="p-2 text-left">📅 日期</th>
-          <th class="p-2 text-left">🏟️ 演出名稱</th>
-          <th class="p-2 text-left">🎵 歌曲名稱</th>
-          <th class="p-2 text-left">🎬 YouTube</th>
-        </tr>
-      </thead>
-      <tbody id="songList">
-        <!-- JavaScript 動態插入 -->
-      </tbody>
-    </table>
+    <!-- 標題 -->
+    <div class="bg-white/60 rounded-xl px-6 py-6 shadow mb-10">
+      <h1 class="text-5xl font-bold text-gray-800 inline-flex items-center justify-center gap-2">
+        🎼 樂團演出歌曲清單
+      </h1>
+      <p id="subtitle" class="text-gray-500 text-base mt-2">請選擇一場活動查看歌曲</p>
+    </div>
+
+    <!-- 活動卡片列表 -->
+    <div id="eventPage">
+      <div id="eventList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
+        <!-- 卡片由 JS 插入 -->
+      </div>
+    </div>
+
+    <!-- 歌曲清單 -->
+    <div id="songPage" class="hidden">
+      <button id="backButton" class="back-button mb-6 mx-auto">← 回到活動列表</button>
+
+      <div class="overflow-x-auto shadow-md rounded-xl">
+        <table class="min-w-full text-lg bg-white mx-auto">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="text-center px-4 py-4 text-gray-700 text-xl">🎵 歌曲名稱</th>
+              <th class="text-left px-4 py-4 text-gray-700 text-xl">🎬 YouTube</th>
+            </tr>
+          </thead>
+          <tbody id="songList" class="divide-y divide-gray-200">
+            <!-- JS 插入 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="loading" class="text-center text-gray-500 mt-6 text-base">資料載入中...</div>
+
   </div>
 
   <script src="script.js"></script>
