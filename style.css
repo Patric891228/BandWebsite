@@ -1,33 +1,33 @@
+/* 背景與字體設定 */
 body {
   background-color: #F9F5F0;
   font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
   color: #333;
 }
 
+/* 活動卡片樣式 */
 .card {
   background-color: #FFF8F0;
   border-radius: 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-
 .card-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #4B3F3F;
 }
-
 .card-date {
   color: #666;
   font-size: 1rem;
 }
 
+/* 返回按鈕樣式 */
 .back-button {
   background-color: #EEE;
   color: #333;
@@ -37,32 +37,34 @@ body {
   display: inline-block;
   font-size: 1rem;
 }
-
 .back-button:hover {
   background-color: #DDD;
 }
 
+/* YouTube 縮圖 hover 放大效果 */
 table img {
   transition: transform 0.3s ease;
 }
 table img:hover {
   transform: scale(1.05);
 }
+
+/* 動畫 - 整體滑入 */
 @keyframes fadeInUp {
-  0% {
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 .fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
+/* 若有需要延遲可加上這個 class */
 .fade-in-up-delayed {
   animation: fadeInUp 0.6s ease-out forwards;
   animation-delay: 0.2s;
