@@ -1,84 +1,99 @@
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec';
+const apiURL = 'https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec';
+
+const eventListEl = document.getElementById('eventList');
+const songListEl = document.getElementById('songList');
+const eventPage = document.getElementById('eventPage');
+const songPage = document.getElementById('songPage');
+const backButton = document.getElementById('backButton');
+const loadingEl = document.getElementById('loading');
+const subtitle = document.getElementById('subtitle');
 
 let allData = [];
 
-async function fetchSongs() {
-  const res = await fetch(SHEET_API_URL);
-  const data = await res.json();
-  allData = data;
-
-  document.getElementById("loading").style.display = "none";
-  renderEventCards(getUniqueEvents(data));
-}
-
-function getUniqueEvents(data) {
-  const seen = new Set();
-  return data.filter(row => {
-    if (seen.has(row.title)) return false;
-    seen.add(row.title);
-    return true;
+fetch(apiURL)
+  .then(res => res.json())
+  .then(data => {
+    allData = data;
+    const events = groupByEvents(data);
+    renderEvents(events);
+    loadingEl.style.display = 'none';
+  })
+  .catch(err => {
+    console.error('資料載入錯誤', err);
+    loadingEl.textContent = '資料載入失敗';
   });
+
+function groupByEvents(data) {
+  const grouped = {};
+  data.forEach(item => {
+    const key = item.date + '_' + item.title;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  });
+  return grouped;
 }
 
-function renderEventCards(events) {
-  const eventList = document.getElementById("eventList");
-  eventList.innerHTML = "";
+function renderEvents(events) {
+  eventListEl.innerHTML = '';
+  Object.entries(events).forEach(([key, songs], index) => {
+    const [date, title] = key.split('_');
+    const dateStr = new Date(date).toLocaleDateString();
 
-  events.forEach(event => {
-    const div = document.createElement("div");
-    div.className = "card p-6 cursor-pointer text-center";
-    div.innerHTML = `
-      <h2 class="card-title">🎤 ${event.title}</h2>
-      <p class="card-date">${formatDate(event.date)}</p>
+    const card = document.createElement('div');
+    card.className = 'bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all cursor-pointer fade-in-up';
+    card.style.animationDelay = `${index * 0.05}s`;
+
+    card.innerHTML = `
+      <h3 class="text-2xl font-bold mb-2">${title}</h3>
+      <p class="text-gray-600">${dateStr}</p>
     `;
-    div.onclick = () => showSongs(event.title);
-    eventList.appendChild(div);
+
+    card.addEventListener('click', () => {
+      renderSongs(songs, title);
+      eventPage.classList.add('hidden');
+      songPage.classList.remove('hidden');
+      songPage.classList.add('fade-in-up');
+      subtitle.textContent = title;
+    });
+
+    eventListEl.appendChild(card);
   });
 }
 
-function showSongs(title) {
-  const songPage = document.getElementById("songPage");
-  const eventPage = document.getElementById("eventPage");
-  const songList = document.getElementById("songList");
+function renderSongs(songs, title) {
+  songListEl.innerHTML = '';
 
-  songList.innerHTML = "";
-  eventPage.classList.add("hidden");
-  songPage.classList.remove("hidden");
+  songs.forEach((song, index) => {
+    const row = document.createElement('tr');
+    row.className = 'fade-in-up-delayed';
+    row.style.animationDelay = `${index * 0.05}s`;
 
-  document.getElementById("subtitle").textContent = `活動：${title}`;
+    const ytThumbnail = song.link
+      ? `<a href="${song.link}" target="_blank">
+           <img src="https://img.youtube.com/vi/${extractYouTubeID(song.link)}/0.jpg" 
+                alt="YT縮圖" 
+                class="w-40 rounded hover:scale-105 transition duration-300">
+         </a>`
+      : '—';
 
-  const songs = allData.filter(row => row.title === title);
-  songs.forEach(row => {
-    const tr = document.createElement("tr");
-    const videoID = extractYouTubeID(row.link);
-    tr.innerHTML = `
-      <td class="px-4 py-3 text-center text-base">${row.song}</td>
-      <td class="px-4 py-3 text-center text-base">
-        ${videoID ? `
-          <a href="${row.link}" target="_blank">
-            <img src="https://img.youtube.com/vi/${videoID}/default.jpg" class="w-20 rounded border">
-          </a>
-        ` : ''}
-      </td>
+    row.innerHTML = `
+      <td class="text-center px-4 py-4">${song.song}</td>
+      <td class="text-left px-4 py-4">${ytThumbnail}</td>
     `;
-    songList.appendChild(tr);
+
+    songListEl.appendChild(row);
   });
 }
 
-function formatDate(iso) {
-  const date = new Date(iso);
-  return date.toLocaleDateString("zh-TW", { year: "numeric", month: "2-digit", day: "2-digit" });
-}
+backButton.addEventListener('click', () => {
+  songPage.classList.add('hidden');
+  eventPage.classList.remove('hidden');
+  eventPage.classList.add('fade-in-up');
+  subtitle.textContent = '請選擇一場活動查看歌曲';
+});
 
 function extractYouTubeID(url) {
-  const match = url?.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([\w\-]{11})/);
-  return match ? match[1] : null;
+  // 擷取 YouTube 影片 ID（支援含 ?si 的參數）
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^&\n?#]+)/);
+  return match ? match[1] : '';
 }
-
-document.getElementById("backButton").onclick = () => {
-  document.getElementById("eventPage").classList.remove("hidden");
-  document.getElementById("songPage").classList.add("hidden");
-  document.getElementById("subtitle").textContent = `請選擇一場活動查看歌曲`;
-};
-
-fetchSongs();
