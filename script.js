@@ -68,6 +68,9 @@ function renderSongs(songs, title) {
     row.className = 'fade-in-up-delayed';
     row.style.animationDelay = `${index * 0.05}s`;
 
+    // 拆分歌曲名稱
+    const [mainTitle, artist] = song.song.split(' / ').map(s => s.trim());
+
     const ytThumbnail = song.link
       ? `<a href="${song.link}" target="_blank">
            <img src="https://img.youtube.com/vi/${extractYouTubeID(song.link)}/0.jpg" 
@@ -77,13 +80,17 @@ function renderSongs(songs, title) {
       : '—';
 
     row.innerHTML = `
-      <td class="text-center px-4 py-4">${song.song}</td>
+      <td class="text-center px-4 py-4">
+        <div class="font-semibold">${mainTitle}</div>
+        ${artist ? `<div class="text-sm text-gray-500">${artist}</div>` : ''}
+      </td>
       <td class="text-left px-4 py-4">${ytThumbnail}</td>
     `;
 
     songListEl.appendChild(row);
   });
 }
+
 
 backButton.addEventListener('click', () => {
   songPage.classList.add('hidden');
