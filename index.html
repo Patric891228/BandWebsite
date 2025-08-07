@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>樂團演出歌曲清單</title>
+  <title>忘憂</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-[#F9F5F0] px-4 py-10 text-lg">
+<body class="bg-[#F9F5F0] px-4 py-6 text-base sm:text-lg">
 
   <div class="max-w-5xl mx-auto text-center">
 
     <!-- 標題 -->
-    <div class="bg-white/60 rounded-xl px-6 py-6 shadow mb-10">
-      <h1 class="text-5xl font-bold text-gray-800 inline-flex items-center justify-center gap-2">
-        🎼 樂團演出歌曲清單
-      </h1>
-      <p id="subtitle" class="text-gray-500 text-base mt-2">請選擇一場活動查看歌曲</p>
+    <div class="bg-white/60 rounded-xl px-6 py-6 shadow mb-8">
+      <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 inline-flex items-center justify-center gap-2">
+        🎼 忘憂演出歌曲清單
+    </h1>
+      <p id="subtitle" class="text-gray-500 text-sm sm:text-base mt-2">請選擇一場活動查看歌曲</p>
     </div>
 
     <!-- 活動卡片列表 -->
@@ -28,14 +28,14 @@
 
     <!-- 歌曲清單 -->
     <div id="songPage" class="hidden">
-      <button id="backButton" class="back-button mb-6 mx-auto">← 回到活動列表</button>
+      <button id="backButton" class="back-button mb-6 mx-auto block">← 回到活動列表</button>
 
       <div class="overflow-x-auto shadow-md rounded-xl">
-        <table class="min-w-full text-lg bg-white mx-auto">
+        <table class="min-w-full text-base sm:text-lg bg-white mx-auto">
           <thead class="bg-gray-100">
             <tr>
-              <th class="text-center px-4 py-4 text-gray-700 text-xl">🎵 歌曲名稱</th>
-              <th class="text-left px-4 py-4 text-gray-700 text-xl">🎬 YouTube</th>
+              <th class="text-center px-4 py-4 text-gray-700 text-base sm:text-xl">🎵 歌曲名稱</th>
+              <th class="text-left px-4 py-4 text-gray-700 text-base sm:text-xl">🎬 YouTube</th>
             </tr>
           </thead>
           <tbody id="songList" class="divide-y divide-gray-200">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div id="loading" class="text-center text-gray-500 mt-6 text-base">資料載入中...</div>
+    <div id="loading" class="text-center text-gray-500 mt-6 text-sm sm:text-base">資料載入中...</div>
 
   </div>
 
