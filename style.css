@@ -57,6 +57,7 @@ body {
 .page-section {
   position: relative;
   transform-origin: center top;
+  overflow: clip;
 }
 
 .page-transition-in {
@@ -66,6 +67,12 @@ body {
 .page-transition-out {
   animation: pageTransitionOut 200ms ease both;
   pointer-events: none;
+}
+
+#eventPage {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .event-card {
