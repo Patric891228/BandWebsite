@@ -46,11 +46,13 @@ function renderEvents(eventsMap) {
   eventListEl.textContent = "";
 
   const fragment = document.createDocumentFragment();
+  let index = 0;
 
   eventsMap.forEach((songs, title) => {
     const eventCard = document.createElement("button");
     eventCard.type = "button";
-    eventCard.className = "event-card";
+    eventCard.className = "event-card is-entering";
+    eventCard.style.animationDelay = `${index * 0.06}s`;
     eventCard.innerHTML = `
       <div>
         <h2 class="event-card-title">${escapeHtml(title)}</h2>
@@ -59,6 +61,7 @@ function renderEvents(eventsMap) {
     `;
     eventCard.addEventListener("click", () => showSongsForEvent(title));
     fragment.appendChild(eventCard);
+    index += 1;
   });
 
   eventListEl.appendChild(fragment);
@@ -67,12 +70,8 @@ function renderEvents(eventsMap) {
 function showSongsForEvent(eventTitle) {
   const songs = eventSongMap.get(eventTitle) || allData.filter((item) => item.title === eventTitle);
   subtitleEl.textContent = `🎼 ${eventTitle}`;
-
-  eventPage.classList.add("hidden");
-  songPage.classList.remove("hidden");
-  restartFadeIn(songPage);
-
   renderSongs(songs);
+  switchPage(eventPage, songPage);
 }
 
 function renderSongs(songs) {
@@ -129,15 +128,33 @@ function splitSongTitle(songTitle = "") {
 }
 
 backButton.addEventListener("click", () => {
-  songPage.classList.add("hidden");
-  eventPage.classList.remove("hidden");
   subtitleEl.textContent = defaultSubtitle;
+  switchPage(songPage, eventPage);
 });
 
-function restartFadeIn(element) {
-  element.classList.remove("fade-in-up");
+function switchPage(fromElement, toElement) {
+  toElement.classList.remove("hidden");
+  toElement.classList.add("page-section");
+  toElement.classList.remove("page-transition-out");
+  restartAnimation(toElement, "page-transition-in");
+
+  if (fromElement.classList.contains("hidden")) {
+    return;
+  }
+
+  fromElement.classList.add("page-section");
+  restartAnimation(fromElement, "page-transition-out");
+
+  window.setTimeout(() => {
+    fromElement.classList.add("hidden");
+    fromElement.classList.remove("page-transition-out");
+  }, 240);
+}
+
+function restartAnimation(element, className) {
+  element.classList.remove(className);
   void element.offsetWidth;
-  element.classList.add("fade-in-up");
+  element.classList.add(className);
 }
 
 function formatDate(dateStr) {
