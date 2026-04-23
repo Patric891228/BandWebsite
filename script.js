@@ -148,7 +148,7 @@ function switchPage(fromElement, toElement) {
   window.setTimeout(() => {
     fromElement.classList.add("hidden");
     fromElement.classList.remove("page-transition-out");
-  }, 240);
+  }, 190);
 }
 
 function restartAnimation(element, className) {
