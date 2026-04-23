@@ -6,93 +6,172 @@ const subtitleEl = document.getElementById("subtitle");
 const loadingEl = document.getElementById("loading");
 const backButton = document.getElementById("backButton");
 
-let allData = [];
+const defaultSubtitle = "點選一場演出，查看當天的歌曲與影片。";
+const dataUrl = "https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec";
 
-fetch("https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec")
+let allData = [];
+let eventSongMap = new Map();
+
+fetch(dataUrl)
   .then((res) => res.json())
   .then((data) => {
-    allData = data;
-    renderEvents(data);
+    allData = Array.isArray(data) ? data : [];
+    eventSongMap = buildEventSongMap(allData);
+    renderEvents(eventSongMap);
     loadingEl.style.display = "none";
+  })
+  .catch(() => {
+    loadingEl.textContent = "資料載入失敗，請稍後再試。";
   });
 
-function renderEvents(data) {
-  const events = [...new Set(data.map((d) => d.title))];
-  events.forEach((title, index) => {
-    const eventCard = document.createElement("div");
-    eventCard.className = "bg-white rounded-xl shadow hover:shadow-lg p-6 cursor-pointer transition duration-300 hover:-translate-y-1";
+function buildEventSongMap(data) {
+  const map = new Map();
+
+  data.forEach((item) => {
+    if (!item?.title) {
+      return;
+    }
+
+    if (!map.has(item.title)) {
+      map.set(item.title, []);
+    }
+
+    map.get(item.title).push(item);
+  });
+
+  return map;
+}
+
+function renderEvents(eventsMap) {
+  eventListEl.textContent = "";
+
+  const fragment = document.createDocumentFragment();
+
+  eventsMap.forEach((songs, title) => {
+    const eventCard = document.createElement("button");
+    eventCard.type = "button";
+    eventCard.className = "event-card";
     eventCard.innerHTML = `
-      <h2 class="text-2xl font-bold text-gray-800 mb-2">${title}</h2>
-      <p class="text-gray-500 text-sm">${formatDate(data.find(d => d.title === title).date)}</p>
+      <div>
+        <h2 class="event-card-title">${escapeHtml(title)}</h2>
+        <p class="event-card-date">${formatDate(songs[0]?.date)}</p>
+      </div>
     `;
     eventCard.addEventListener("click", () => showSongsForEvent(title));
-    eventListEl.appendChild(eventCard);
+    fragment.appendChild(eventCard);
   });
+
+  eventListEl.appendChild(fragment);
 }
 
 function showSongsForEvent(eventTitle) {
-  const songs = allData.filter((d) => d.title === eventTitle);
-  subtitleEl.textContent = `🎤 ${eventTitle}`;
+  const songs = eventSongMap.get(eventTitle) || allData.filter((item) => item.title === eventTitle);
+  subtitleEl.textContent = `🎼 ${eventTitle}`;
 
   eventPage.classList.add("hidden");
   songPage.classList.remove("hidden");
-
-  // 套用整體動畫（避免卡頓）
-  songPage.classList.remove("fade-in-up");
-  void songPage.offsetWidth;
-  songPage.classList.add("fade-in-up");
+  restartFadeIn(songPage);
 
   renderSongs(songs);
 }
 
-function renderSongs(songs, title) {
-  songListEl.innerHTML = '';
+function renderSongs(songs) {
+  songListEl.textContent = "";
+
+  const fragment = document.createDocumentFragment();
 
   songs.forEach((song, index) => {
-    const row = document.createElement('tr');
-    row.className = 'fade-in-up-delayed';
+    const row = document.createElement("tr");
+    row.className = "fade-in-up-delayed";
     row.style.animationDelay = `${index * 0.05}s`;
 
-    const [mainTitle, artist] = song.song.split(' / ').map(s => s.trim());
+    const [mainTitle, artist] = splitSongTitle(song.song);
     const ytID = extractYouTubeID(song.link);
 
-    const ytThumbnail = ytID
-      ? `<a href="${song.link}" target="_blank">
-           <img src="https://img.youtube.com/vi/${ytID}/0.jpg" 
-                alt="YT縮圖" 
-                class="w-40 rounded hover:scale-105 transition duration-300">
-         </a>`
-      : '—';
-
     row.innerHTML = `
-      <td class="text-center px-4 py-4">
-        <div class="font-semibold">${mainTitle}</div>
-        ${artist ? `<div class="text-sm text-gray-500">${artist}</div>` : ''}
+      <td class="px-4 py-4 text-center">
+        <div class="song-title">${escapeHtml(mainTitle)}</div>
+        ${artist ? `<div class="song-artist">${escapeHtml(artist)}</div>` : ""}
       </td>
-      <td class="text-left px-4 py-4">${ytThumbnail}</td>
+      <td class="px-4 py-4 text-left">${renderThumbnail(song.link, ytID, mainTitle)}</td>
     `;
 
-    songListEl.appendChild(row);
+    fragment.appendChild(row);
   });
+
+  songListEl.appendChild(fragment);
+}
+
+function renderThumbnail(link, ytID, title) {
+  if (!ytID) {
+    return '<span class="video-unavailable">無影片</span>';
+  }
+
+  const safeLink = escapeAttribute(link);
+  const safeTitle = escapeAttribute(`${title} YouTube 影片`);
+
+  return `
+    <a class="thumbnail-link" href="${safeLink}" target="_blank" rel="noopener noreferrer" aria-label="${safeTitle}">
+      <img
+        class="thumbnail-image"
+        src="https://img.youtube.com/vi/${ytID}/mqdefault.jpg"
+        alt="${safeTitle}"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  `;
+}
+
+function splitSongTitle(songTitle = "") {
+  const parts = songTitle.split(" / ").map((part) => part.trim()).filter(Boolean);
+  return [parts[0] || "未命名歌曲", parts[1] || ""];
 }
 
 backButton.addEventListener("click", () => {
   songPage.classList.add("hidden");
   eventPage.classList.remove("hidden");
-  subtitleEl.textContent = "請選擇一場活動查看歌曲";
+  subtitleEl.textContent = defaultSubtitle;
 });
 
-// 工具函式
+function restartFadeIn(element) {
+  element.classList.remove("fade-in-up");
+  void element.offsetWidth;
+  element.classList.add("fade-in-up");
+}
+
 function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("zh-TW", {
+  if (!dateStr) {
+    return "日期未提供";
+  }
+
+  const date = new Date(dateStr);
+
+  if (Number.isNaN(date.getTime())) {
+    return dateStr;
+  }
+
+  return date.toLocaleDateString("zh-TW", {
     year: "numeric",
     month: "long",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
-function extractYouTubeID(url) {
+function extractYouTubeID(url = "") {
   const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]+)/);
   return match ? match[1] : null;
+}
+
+function escapeHtml(value = "") {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function escapeAttribute(value = "") {
+  return escapeHtml(value);
 }

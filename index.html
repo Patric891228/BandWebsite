@@ -3,50 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>忘憂</title>
+  <meta name="color-scheme" content="light" />
+  <title>樂團歌單</title>
+  <link rel="preconnect" href="https://script.google.com" />
+  <link rel="preconnect" href="https://img.youtube.com" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="bg-[#F9F5F0] px-4 py-10 text-lg">
-
   <div class="max-w-5xl mx-auto text-center">
-
-    <!-- 標題 -->
-    <div class="bg-white/60 rounded-xl px-6 py-6 shadow mb-10">
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-800 inline-flex items-center justify-center gap-2">
-        🎼 忘憂演出歌單
+    <div class="hero-panel mb-10 rounded-[28px] px-6 py-6 md:px-10 md:py-8">
+      <h1 class="inline-flex items-center justify-center gap-2 text-4xl font-bold text-gray-800 md:text-5xl">
+        🎵 樂團演出歌單
       </h1>
-      <p id="subtitle" class="text-gray-500 text-base mt-2">請選擇一場活動查看歌單</p>
+      <p id="subtitle" class="subtitle-text mt-3 text-base">點選一場演出，查看當天的歌曲與影片。</p>
     </div>
 
-    <!-- 活動卡片列表 -->
     <div id="eventPage">
-      <div id="eventList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
-        <!-- 卡片由 JS 插入 -->
+      <div id="eventList" class="grid grid-cols-1 gap-6 justify-center sm:grid-cols-2 md:grid-cols-3">
       </div>
     </div>
 
-    <!-- 歌曲清單 -->
     <div id="songPage" class="hidden fade-in-up">
-      <button id="backButton" class="back-button mb-6 mx-auto transition-transform duration-300 hover:scale-105">← 回到活動列表</button>
+      <button id="backButton" type="button" class="back-button mb-6 mx-auto transition-transform duration-300 hover:scale-105">
+        返回演出列表
+      </button>
 
-      <div class="overflow-x-auto shadow-md rounded-xl">
-        <table class="min-w-full text-lg bg-white mx-auto">
-          <thead class="bg-gray-100">
+      <div class="song-table-shell overflow-x-auto rounded-[24px]">
+        <table class="song-table mx-auto min-w-full bg-white text-lg">
+          <thead>
             <tr>
-              <th class="text-center px-4 py-4 text-gray-700 text-xl">🎵 歌曲名稱</th>
-              <th class="text-center sm:text-left px-4 py-4 text-gray-700 text-xl">🎬 YouTube</th>
+              <th class="px-4 py-4 text-center text-xl">歌曲</th>
+              <th class="px-4 py-4 text-center text-xl sm:text-left">YouTube</th>
             </tr>
           </thead>
-          <tbody id="songList" class="divide-y divide-gray-200 fade-in-up-delayed">
-            <!-- JS 插入 -->
+          <tbody id="songList" class="fade-in-up-delayed divide-y divide-gray-200">
           </tbody>
         </table>
       </div>
     </div>
 
-    <div id="loading" class="text-center text-gray-500 mt-6 text-base">資料載入中...</div>
-
+    <div id="loading" class="loading-copy mt-6 text-center text-base">資料載入中...</div>
   </div>
 
   <script src="script.js"></script>

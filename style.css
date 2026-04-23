@@ -1,71 +1,221 @@
-/* 背景與字體設定 */
+:root {
+  --page-bg: #f7f1e8;
+  --panel-bg: rgba(255, 252, 247, 0.82);
+  --panel-border: rgba(133, 96, 66, 0.12);
+  --card-bg: linear-gradient(180deg, #fffdf8 0%, #fff6ea 100%);
+  --card-shadow: 0 14px 35px rgba(115, 88, 62, 0.12);
+  --card-shadow-hover: 0 20px 42px rgba(115, 88, 62, 0.18);
+  --text-main: #3f342d;
+  --text-subtle: #7b6f67;
+  --accent: #b86f3d;
+  --accent-soft: #f3e2d2;
+  --table-head: #f6ede1;
+  --row-hover: rgba(184, 111, 61, 0.06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: #F9F5F0;
-  font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
-  color: #333;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.7), transparent 28%),
+    linear-gradient(180deg, #fbf7f2 0%, var(--page-bg) 100%);
+  color: var(--text-main);
+  font-family: "Segoe UI", "Noto Sans TC", sans-serif;
 }
 
-/* 活動卡片樣式 */
-.card {
-  background-color: #FFF8F0;
-  border-radius: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-.card-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #4B3F3F;
-}
-.card-date {
-  color: #666;
-  font-size: 1rem;
+.hero-panel,
+.song-table-shell {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 20px 48px rgba(91, 71, 54, 0.09);
+  backdrop-filter: blur(12px);
 }
 
-/* 返回按鈕樣式 */
+.subtitle-text,
+.loading-copy {
+  color: var(--text-subtle);
+}
+
+#eventList,
+#songList {
+  content-visibility: auto;
+}
+
+.event-card {
+  min-height: 168px;
+  display: grid;
+  align-content: space-between;
+  text-align: left;
+  padding: 1.5rem;
+  border: 1px solid rgba(133, 96, 66, 0.1);
+  border-radius: 1.4rem;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+  will-change: transform;
+}
+
+.event-card:hover,
+.event-card:focus-visible {
+  transform: translateY(-5px);
+  border-color: rgba(184, 111, 61, 0.3);
+  box-shadow: var(--card-shadow-hover);
+  outline: none;
+}
+
+.event-card-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-main);
+}
+
+.event-card-date {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: 0.98rem;
+}
+
 .back-button {
-  background-color: #EEE;
-  color: #333;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.72rem 1.35rem;
+  border: 1px solid rgba(133, 96, 66, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.9);
+  color: var(--text-main);
   font-size: 1rem;
+  box-shadow: 0 10px 24px rgba(91, 71, 54, 0.08);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
+
 .back-button:hover {
-  background-color: #DDD;
+  background: #fff;
+  border-color: rgba(184, 111, 61, 0.22);
+  box-shadow: 0 14px 28px rgba(91, 71, 54, 0.12);
 }
 
-/* YouTube 縮圖 hover 放大效果 */
-table img {
-  transition: transform 0.3s ease;
-}
-table img:hover {
-  transform: scale(1.05);
+.song-table {
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-/* 動畫 - 整體滑入 */
+.song-table thead th {
+  background: var(--table-head);
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.song-table tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.song-table tbody tr:hover {
+  background: var(--row-hover);
+}
+
+.song-title {
+  font-weight: 700;
+}
+
+.song-artist {
+  margin-top: 0.25rem;
+  color: var(--text-subtle);
+  font-size: 0.94rem;
+}
+
+.thumbnail-link {
+  display: inline-flex;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(74, 56, 42, 0.14);
+}
+
+.thumbnail-image {
+  width: 10rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition: transform 220ms ease;
+}
+
+.thumbnail-link:hover .thumbnail-image,
+.thumbnail-link:focus-visible .thumbnail-image {
+  transform: scale(1.04);
+}
+
+.video-unavailable {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.92rem;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate3d(0, 20px, 0);
   }
+
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
+
 .fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
-/* 若有需要延遲可加上這個 class */
 .fade-in-up-delayed {
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 0.2s;
+  animation: fadeInUp 0.5s ease-out forwards;
+  animation-delay: 0.12s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .event-card {
+    min-height: auto;
+  }
+
+  .song-table thead th,
+  .song-table tbody td {
+    padding: 1rem 0.9rem;
+  }
+
+  .thumbnail-image {
+    width: 8.5rem;
+  }
 }
