@@ -190,12 +190,7 @@ body {
   width: 10rem;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  transition: transform 220ms ease;
-}
-
-.thumbnail-link:hover .thumbnail-image,
-.thumbnail-link:focus-visible .thumbnail-image {
-  transform: scale(1.04);
+  transform-origin: center;
 }
 
 .video-unavailable {
