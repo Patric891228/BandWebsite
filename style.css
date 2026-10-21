@@ -740,7 +740,13 @@ body[data-theme="dark"] .song-table {
   .brand-icon { width: 2.1rem; height: 2.1rem; }
   .site-main { width: calc(100% - 24px); margin-top: 0.75rem; }
   .search-section { margin-bottom: 1.5rem; }
-  .search-toolbar { grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; padding: 0.55rem 0.6rem 0.55rem 0.8rem; }
+  .search-toolbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.55rem 0.6rem 0.55rem 0.8rem;
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft), 0 8px 24px rgba(27, 38, 79, 0.12);
+  }
   .hero-search-divider { display: none; }
   .sort-control { grid-column: 2; grid-row: 2; min-width: 0; width: 100%; padding: 0.45rem 0.55rem; }
   .sort-control select { font-size: 0.8rem; }
