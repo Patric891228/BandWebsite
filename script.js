@@ -20,11 +20,32 @@ const eventDetailsEl = document.getElementById("eventDetails");
 const songSearchEl = document.getElementById("songSearch");
 const songCountEl = document.getElementById("songCount");
 const songEmptyEl = document.getElementById("songEmpty");
+const themeToggleEl = document.getElementById("themeToggle");
+const themeIconEl = document.getElementById("themeIcon");
 
 const defaultSubtitle = "";
 const dataUrl = "https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec";
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const queryParams = new URLSearchParams(window.location.search);
+
+function applyTheme(theme, persist = false) {
+  const isDark = theme === "dark";
+  document.body.dataset.theme = isDark ? "dark" : "light";
+  themeToggleEl.setAttribute("aria-pressed", String(isDark));
+  themeToggleEl.setAttribute("aria-label", isDark ? "切換至淺色模式" : "切換至深色模式");
+  themeToggleEl.title = isDark ? "切換至淺色模式" : "切換至深色模式";
+  themeIconEl.textContent = isDark ? "☀" : "☾";
+  if (persist) {
+    try { window.localStorage.setItem("band-website-theme", isDark ? "dark" : "light"); } catch {}
+  }
+}
+
+let savedTheme = null;
+try { savedTheme = window.localStorage.getItem("band-website-theme"); } catch {}
+applyTheme(savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+themeToggleEl.addEventListener("click", () => {
+  applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark", true);
+});
 
 let allData = [];
 let eventSongMap = new Map();
@@ -52,6 +73,9 @@ function drawRepeater(time) {
   const easeInOutQuad = (x) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
   const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
   const count = 1 + (N - 1) * (easeInOutQuad(progress(u, 0.35, 1.7)) - easeInOutQuad(progress(u, 3.6, 4.45)));
+  const palette = document.body.dataset.theme === "dark"
+    ? ["#274690", "#576CA8", "#F5F3F5", "#1B264F"]
+    : REPEATER_PALETTE;
 
   for (let i = N - 1; i >= 0; i--) {
     const visibility = i === 0 ? 1 : Math.max(0, Math.min(1, count - i));
@@ -62,7 +86,7 @@ function drawRepeater(time) {
     ctx.translate(X + Math.cos(angle) * R, Y + Math.sin(angle) * R);
     ctx.rotate(angle + Math.PI / 2);
     ctx.scale(pulse, pulse);
-    ctx.fillStyle = REPEATER_PALETTE[i % REPEATER_PALETTE.length];
+    ctx.fillStyle = palette[i % palette.length];
     ctx.beginPath();
     ctx.roundRect(-12, -30, 24, 60, 12);
     ctx.fill();
