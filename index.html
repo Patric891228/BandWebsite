@@ -17,23 +17,20 @@
   </header>
 
   <main class="site-main">
-    <section class="hero-panel" aria-label="演出搜尋">
-      <div class="hero-image-placeholder" aria-hidden="true">
-        <span class="placeholder-orbit orbit-one"></span><span class="placeholder-orbit orbit-two"></span>
-        <span class="placeholder-note">♫</span>
-      </div>
-      <div class="hero-search-shell">
+    <section class="search-section" aria-label="演出搜尋">
+      <div class="search-toolbar">
         <div class="hero-search-icon" aria-hidden="true">⌕</div>
         <div class="hero-search-field">
           <label class="sr-only" for="eventSearch">搜尋演出、歌曲或歌手</label>
           <input id="eventSearch" type="search" autocomplete="off" />
         </div>
         <div class="hero-search-divider"></div>
-        <div class="event-sort-field">
-          <label for="eventSort">排列方式</label>
+        <div class="sort-control">
+          <span class="sort-icon" aria-hidden="true">↕</span>
+          <label class="sr-only" for="eventSort">排序</label>
           <select id="eventSort">
-            <option value="date-desc">最新演出</option>
-            <option value="date-asc">最早演出</option>
+            <option value="date-desc">日期由新到舊</option>
+            <option value="date-asc">日期由舊到新</option>
             <option value="title-asc">演出名稱</option>
           </select>
         </div>
