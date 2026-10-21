@@ -17,6 +17,8 @@ const globalSongResultsEl = document.getElementById("globalSongResults");
 const globalSongHeadingEl = document.getElementById("globalSongHeading");
 const globalSongListEl = document.getElementById("globalSongList");
 const eventDetailsEl = document.getElementById("eventDetails");
+const eventGalleryEl = document.getElementById("eventGallery");
+const eventGalleryTrackEl = document.getElementById("eventGalleryTrack");
 const songSearchEl = document.getElementById("songSearch");
 const songCountEl = document.getElementById("songCount");
 const songEmptyEl = document.getElementById("songEmpty");
@@ -27,6 +29,12 @@ const defaultSubtitle = "";
 const dataUrl = "https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec";
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const queryParams = new URLSearchParams(window.location.search);
+
+// Add photos by event title here; each event can use local paths or image URLs.
+// Example: "Event title": ["images/show-1.jpg", "images/show-2.jpg"]
+const EVENT_PHOTOS = {};
+let eventGalleryFrame = 0;
+let eventGalleryResizeObserver = null;
 
 function applyTheme(theme, persist = false) {
   const isDark = theme === "dark";
@@ -284,6 +292,7 @@ function showSongsForEvent(eventTitle, updateUrl = true) {
   subtitleEl.textContent = `🎼 ${eventTitle}`;
   songSearchEl.value = "";
   renderEventDetails(songs);
+  renderEventGallery(eventTitle, songs);
   renderSongs();
   switchPage(eventPage, songPage);
   if (updateUrl) setEventUrl(eventTitle);
@@ -299,6 +308,108 @@ function renderEventDetails(songs) {
   ].filter(Boolean);
   eventDetailsEl.textContent = details.join("・");
   eventDetailsEl.hidden = details.length === 0;
+}
+
+function renderEventGallery(eventTitle, songs) {
+  stopEventGalleryPlayback();
+  eventGalleryTrackEl.textContent = "";
+  const photos = getEventPhotos(eventTitle, songs);
+  eventGalleryEl.hidden = photos.length === 0;
+  if (!photos.length) return;
+
+  const createPhotoGroup = (duplicate = false) => {
+    const group = document.createElement("div");
+    group.className = "event-gallery-group";
+    if (duplicate) group.setAttribute("aria-hidden", "true");
+    photos.forEach((src, index) => {
+      const item = document.createElement("div");
+      item.className = "event-gallery-item";
+      const image = document.createElement("img");
+      image.src = src;
+      image.alt = duplicate ? "" : `${eventTitle} 活動照片 ${index + 1}`;
+      image.loading = duplicate ? "lazy" : (index < 2 ? "eager" : "lazy");
+      image.decoding = "async";
+      item.appendChild(image);
+      group.appendChild(item);
+    });
+    eventGalleryTrackEl.appendChild(group);
+  };
+
+  createPhotoGroup();
+  createPhotoGroup(true);
+  startEventGalleryPlayback(eventGalleryEl, eventGalleryTrackEl);
+}
+
+function getEventPhotos(eventTitle, songs) {
+  const configured = EVENT_PHOTOS[eventTitle];
+  const values = configured ? (Array.isArray(configured) ? [...configured] : [configured]) : [];
+  songs.forEach((song) => {
+    [song.photos, song.images, song.photo, song.image].forEach((value) => {
+      if (Array.isArray(value)) values.push(...value);
+      else if (typeof value === "string" && value.trim()) {
+        const trimmed = value.trim();
+        try {
+          const parsed = JSON.parse(trimmed);
+          values.push(...(Array.isArray(parsed) ? parsed : [parsed]));
+        } catch {
+          values.push(...trimmed.split(/[\n|;]/));
+        }
+      }
+    });
+  });
+  return Array.from(new Set(values.map((value) => safeImageUrl(value)).filter(Boolean)));
+}
+
+function safeImageUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return "";
+  const src = value.trim();
+  try {
+    const url = new URL(src, window.location.href);
+    return ["http:", "https:"].includes(url.protocol) ? src : "";
+  } catch {
+    return "";
+  }
+}
+
+function startEventGalleryPlayback(gallery, track) {
+  if (reducedMotionQuery.matches) return;
+  let previousTime = 0;
+  let cycleWidth = 0;
+  const measure = () => {
+    const groups = track.children;
+    if (groups.length < 2) return;
+    cycleWidth = groups[1].offsetLeft - groups[0].offsetLeft;
+    while (cycleWidth > 0 && track.scrollWidth < gallery.clientWidth + cycleWidth && groups.length < 50) {
+      const duplicate = groups[0].cloneNode(true);
+      duplicate.setAttribute("aria-hidden", "true");
+      track.appendChild(duplicate);
+    }
+  };
+  measure();
+  if ("ResizeObserver" in window) {
+    eventGalleryResizeObserver = new ResizeObserver(measure);
+    eventGalleryResizeObserver.observe(gallery);
+  }
+
+  const tick = (time) => {
+    if (!gallery.isConnected) {
+      return;
+    }
+    if (previousTime && !document.hidden && !songPage.classList.contains("hidden") && !gallery.matches(":hover") && !gallery.matches(":focus-within")) {
+      gallery.scrollLeft += Math.min(time - previousTime, 50) * 0.022;
+      if (cycleWidth > 0 && gallery.scrollLeft >= cycleWidth) gallery.scrollLeft -= cycleWidth;
+    }
+    previousTime = time;
+    eventGalleryFrame = window.requestAnimationFrame(tick);
+  };
+  eventGalleryFrame = window.requestAnimationFrame(tick);
+}
+
+function stopEventGalleryPlayback() {
+  if (eventGalleryFrame) window.cancelAnimationFrame(eventGalleryFrame);
+  eventGalleryFrame = 0;
+  eventGalleryResizeObserver?.disconnect();
+  eventGalleryResizeObserver = null;
 }
 
 function renderSongs() {
