@@ -4,6 +4,8 @@ const eventListEl = document.getElementById("eventList");
 const songListEl = document.getElementById("songList");
 const subtitleEl = document.getElementById("subtitle");
 const loadingEl = document.getElementById("loading");
+const loadingMessageEl = document.getElementById("loadingMessage");
+const loadingCanvas = document.getElementById("loadingAnimation");
 const backButton = document.getElementById("backButton");
 const retryButton = document.getElementById("retryButton");
 const eventSearchEl = document.getElementById("eventSearch");
@@ -29,6 +31,77 @@ let eventSongMap = new Map();
 let currentEventTitle = "";
 let currentSongs = [];
 let requestController = null;
+let loadingFrame = 0;
+let loadingStart = 0;
+
+// Motion Prompt #134 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#134
+// Repeater: keep the reference geometry, 4.7 s cycle, timing and easing; adapt only palette/background.
+const REPEATER_CYCLE = 4.7;
+const REPEATER_PALETTE = ["#7c9ebb", "#9bb4ca", "#bacbd9", "#d4e0e9"];
+const REPEATER_WHITE = "#ffffff";
+const repeaterCanvasContext = loadingCanvas.getContext("2d");
+
+function drawRepeater(time) {
+  const u = (time % REPEATER_CYCLE + REPEATER_CYCLE) % REPEATER_CYCLE;
+  const ctx = repeaterCanvasContext;
+  const w = loadingCanvas.width;
+  const h = loadingCanvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const N = 12, X = w / 2, Y = h / 2, R = 58, spin = 2 * Math.PI * u / REPEATER_CYCLE;
+  const progress = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)));
+  const easeInOutQuad = (x) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+  const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
+  const count = 1 + (N - 1) * (easeInOutQuad(progress(u, 0.35, 1.7)) - easeInOutQuad(progress(u, 3.6, 4.45)));
+
+  for (let i = N - 1; i >= 0; i--) {
+    const visibility = i === 0 ? 1 : Math.max(0, Math.min(1, count - i));
+    if (visibility <= 0) continue;
+    const angle = spin + (i === 0 ? 0 : (i - 1 + easeOutCubic(visibility)) * 2 * Math.PI / N);
+    const pulse = (1 + 0.22 * Math.sin(2 * Math.PI * 2 * u / REPEATER_CYCLE - i * 0.55)) * (0.55 + 0.45 * visibility);
+    ctx.save();
+    ctx.translate(X + Math.cos(angle) * R, Y + Math.sin(angle) * R);
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.scale(pulse, pulse);
+    ctx.fillStyle = REPEATER_PALETTE[i % REPEATER_PALETTE.length];
+    ctx.beginPath();
+    ctx.roundRect(-12, -30, 24, 60, 12);
+    ctx.fill();
+    if (i === 0) {
+      ctx.strokeStyle = REPEATER_WHITE;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.fillStyle = "#6e859a";
+  ctx.font = '800 40px "Segoe UI", sans-serif';
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText(`×${Math.round(count)}`, w - 34, 46);
+}
+
+function animateLoading(time) {
+  if (loadingEl.hidden || !loadingCanvas.isConnected) {
+    loadingFrame = 0;
+    return;
+  }
+  if (!loadingStart) loadingStart = time;
+  drawRepeater((time - loadingStart) / 1000);
+  loadingFrame = window.requestAnimationFrame(animateLoading);
+}
+
+function startLoadingAnimation() {
+  if (loadingFrame) return;
+  loadingStart = 0;
+  loadingFrame = window.requestAnimationFrame(animateLoading);
+}
+
+function stopLoadingAnimation() {
+  if (loadingFrame) window.cancelAnimationFrame(loadingFrame);
+  loadingFrame = 0;
+  loadingStart = 0;
+  repeaterCanvasContext.clearRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+}
 
 loadData();
 
@@ -36,7 +109,8 @@ async function loadData() {
   if (requestController) requestController.abort();
   requestController = new AbortController();
   loadingEl.hidden = false;
-  loadingEl.textContent = "資料載入中...";
+  loadingMessageEl.textContent = "資料載入中...";
+  startLoadingAnimation();
   retryButton.hidden = true;
   eventEmptyEl.hidden = true;
 
@@ -49,6 +123,7 @@ async function loadData() {
     allData = data;
     eventSongMap = buildEventSongMap(data);
     loadingEl.hidden = true;
+    stopLoadingAnimation();
     eventToolsEl.hidden = eventSongMap.size === 0;
     renderEvents();
     if (eventSongMap.size === 0) showEventEmpty("目前沒有演出資料。");
@@ -56,7 +131,8 @@ async function loadData() {
   } catch (error) {
     if (error.name === "AbortError") return;
     loadingEl.hidden = false;
-    loadingEl.textContent = "資料載入失敗，請確認網路連線後重試。";
+    loadingMessageEl.textContent = "資料載入失敗，請確認網路連線後重試。";
+    stopLoadingAnimation();
     retryButton.hidden = false;
   }
 }

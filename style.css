@@ -49,6 +49,17 @@ body {
   color: var(--text-subtle);
 }
 
+.loading-animation {
+  display: block;
+  width: min(100%, 539px);
+  height: auto;
+  margin: 0 auto -2.5rem;
+}
+
+.loading-copy[hidden] {
+  display: none;
+}
+
 #eventList,
 #songList {
   content-visibility: auto;
