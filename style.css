@@ -745,7 +745,7 @@ body[data-theme="dark"] .song-table {
     gap: 0.5rem;
     padding: 0.55rem 0.6rem 0.55rem 0.8rem;
   }
-  .hero-search-field { min-width: 0; padding: 0.4rem 0.65rem; border: 1.5px solid var(--accent); border-radius: 0.7rem; }
+  .hero-search-field { min-width: 0; padding: 0.4rem 0.65rem; border: 2px solid var(--accent); border-radius: 0.7rem; }
   .hero-search-field:focus-within { box-shadow: 0 0 0 2px var(--accent-soft); }
   .hero-search-divider { display: none; }
   .sort-control { grid-column: 2; grid-row: 2; min-width: 0; width: 100%; padding: 0.45rem 0.55rem; }
