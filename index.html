@@ -21,14 +21,30 @@
     </div>
 
     <div id="eventPage">
-      <div id="eventList" class="grid grid-cols-1 gap-6 justify-center sm:grid-cols-2 md:grid-cols-3">
+      <div id="eventTools" class="event-tools" hidden>
+        <label class="sr-only" for="eventSearch">搜尋演出</label>
+        <input id="eventSearch" type="search" placeholder="搜尋演出名稱" autocomplete="off" />
+        <label for="eventSort">排序</label>
+        <select id="eventSort">
+          <option value="date-desc">日期：新到舊</option>
+          <option value="date-asc">日期：舊到新</option>
+          <option value="title-asc">名稱：依字母排序</option>
+        </select>
       </div>
+      <p id="eventCount" class="status-copy" aria-live="polite"></p>
+      <div id="eventList" class="grid grid-cols-1 gap-6 justify-center sm:grid-cols-2 md:grid-cols-3"></div>
+      <div id="eventEmpty" class="empty-state" hidden></div>
     </div>
 
     <div id="songPage" class="hidden fade-in-up">
       <button id="backButton" type="button" class="back-button mb-6 mx-auto transition-transform duration-300 hover:scale-105">
         返回演出列表
       </button>
+      <div id="eventDetails" class="event-details" hidden></div>
+      <label class="sr-only" for="songSearch">搜尋歌曲</label>
+      <input id="songSearch" class="song-search" type="search" placeholder="搜尋歌曲或歌手" autocomplete="off" />
+      <p id="songCount" class="status-copy" aria-live="polite"></p>
+      <div id="songEmpty" class="empty-state" hidden></div>
 
       <div class="song-table-shell overflow-x-auto rounded-[24px]">
         <table class="song-table mx-auto min-w-full bg-white text-lg">
@@ -44,7 +60,8 @@
       </div>
     </div>
 
-    <div id="loading" class="loading-copy mt-6 text-center text-base">資料載入中...</div>
+    <div id="loading" class="loading-copy mt-6 text-center text-base" role="status" aria-live="polite">資料載入中...</div>
+    <button id="retryButton" class="back-button retry-button" type="button" hidden>重新載入</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13/dist/gsap.min.js"></script>

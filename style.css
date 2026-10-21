@@ -288,3 +288,87 @@ body {
     width: 8.5rem;
   }
 }
+
+.event-tools,
+.event-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 auto 1rem;
+  color: var(--text-subtle);
+}
+
+.event-tools[hidden],
+.event-details[hidden],
+.empty-state[hidden],
+#retryButton[hidden] {
+  display: none;
+}
+
+.event-tools input,
+.event-tools select,
+.song-search {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--panel-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-main);
+}
+
+.event-tools input {
+  min-width: min(20rem, 100%);
+}
+
+.song-search {
+  width: min(28rem, 100%);
+  margin: 0 auto 0.5rem;
+}
+
+.event-details,
+.status-copy,
+.empty-state {
+  color: var(--text-subtle);
+  text-align: center;
+}
+
+.status-copy {
+  margin: 0.75rem 0 1rem;
+  font-size: 0.95rem;
+}
+
+.empty-state {
+  padding: 1.5rem;
+}
+
+.event-card-count {
+  margin: 0;
+  color: var(--text-subtle);
+  font-size: 0.95rem;
+}
+
+.thumbnail-fallback {
+  display: inline-flex;
+  min-width: 10rem;
+  min-height: 5.625rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: var(--accent-soft);
+  color: var(--text-subtle);
+  font-size: 0.9rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
