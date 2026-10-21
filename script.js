@@ -181,7 +181,7 @@ function renderEvents() {
 
   const events = getEvents();
   const isSearching = Boolean(search);
-  eventSectionTitleEl.textContent = isSearching ? "符合的演出場次" : "值得再聽一次的現場";
+  eventSectionTitleEl.textContent = isSearching ? "符合的演出場次" : "探索演出現場，重溫每一首歌。";
   eventListEl.hidden = isSearching && events.length === 0;
   eventCountEl.textContent = `${events.length} 場演出`;
   eventEmptyEl.hidden = events.length > 0;
