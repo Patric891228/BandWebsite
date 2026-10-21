@@ -30,9 +30,14 @@ const dataUrl = "https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgx
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const queryParams = new URLSearchParams(window.location.search);
 
-// Add photos by event title here; each event can use local paths or image URLs.
+// Replace these temporary images per event when the real activity photos are ready.
 // Example: "Event title": ["images/show-1.jpg", "images/show-2.jpg"]
 const EVENT_PHOTOS = {};
+const EVENT_PHOTO_PLACEHOLDERS = [
+  "images/event-placeholder-1.svg",
+  "images/event-placeholder-2.svg",
+  "images/event-placeholder-3.svg"
+];
 let eventGalleryFrame = 0;
 let eventGalleryResizeObserver = null;
 
@@ -357,7 +362,8 @@ function getEventPhotos(eventTitle, songs) {
       }
     });
   });
-  return Array.from(new Set(values.map((value) => safeImageUrl(value)).filter(Boolean)));
+  const photos = Array.from(new Set(values.map((value) => safeImageUrl(value)).filter(Boolean)));
+  return photos.length ? photos : EVENT_PHOTO_PLACEHOLDERS;
 }
 
 function safeImageUrl(value) {

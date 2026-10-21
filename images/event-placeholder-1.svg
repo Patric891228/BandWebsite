@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" fill="none">
+  <defs>
+    <linearGradient id="sky" x2="1" y2="1"><stop stop-color="#1B264F"/><stop offset=".55" stop-color="#274690"/><stop offset="1" stop-color="#576CA8"/></linearGradient>
+    <linearGradient id="beam" x1=".5" y1="0" x2=".5" y2="1"><stop stop-color="#F5F3F5" stop-opacity=".72"/><stop offset="1" stop-color="#F5F3F5" stop-opacity="0"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="32"/></filter>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1200v750H0z"/>
+  <ellipse cx="600" cy="330" rx="330" ry="170" fill="#576CA8" opacity=".42" filter="url(#blur)"/>
+  <path fill="url(#beam)" opacity=".24" d="m145 64 150 0 240 560H370zM905 64h150L830 624H690z"/>
+  <path fill="#302B27" d="M0 568q63-31 124 0 48-66 95 0 56-82 111 0 47-51 91 0 67-87 133 0 49-67 97 0 67-91 137 0 51-55 101 0 62-80 125 0 49-65 100 0 44-35 86 0v182H0z"/>
+  <circle cx="600" cy="250" r="32" fill="#F5F3F5" opacity=".7"/>
+  <path d="M600 287v170m-52-93h104m-52 93-62 110m62-110 64 110" stroke="#F5F3F5" stroke-linecap="round" stroke-width="20" opacity=".68"/>
+</svg>
