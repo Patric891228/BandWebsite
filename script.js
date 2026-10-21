@@ -4,7 +4,6 @@ const eventListEl = document.getElementById("eventList");
 const songListEl = document.getElementById("songList");
 const subtitleEl = document.getElementById("subtitle");
 const loadingEl = document.getElementById("loading");
-const loadingMessageEl = document.getElementById("loadingMessage");
 const loadingCanvas = document.getElementById("loadingAnimation");
 const backButton = document.getElementById("backButton");
 const retryButton = document.getElementById("retryButton");
@@ -35,7 +34,7 @@ let loadingFrame = 0;
 let loadingStart = 0;
 
 // Motion Prompt #134 · MIT License (c) 2026 Shohei Ohtaki · https://showheyohtaki.github.io/motion-prompt/#134
-// Repeater: keep the reference geometry, 4.7 s cycle, timing and easing; adapt only palette/background.
+// Repeater: keep the reference geometry, 4.7 s cycle, timing and easing; adapt only palette/background and omit the counter.
 const REPEATER_CYCLE = 4.7;
 const REPEATER_PALETTE = ["#7c9ebb", "#9bb4ca", "#bacbd9", "#d4e0e9"];
 const REPEATER_WHITE = "#ffffff";
@@ -73,11 +72,6 @@ function drawRepeater(time) {
     }
     ctx.restore();
   }
-  ctx.fillStyle = "#6e859a";
-  ctx.font = '800 40px "Segoe UI", sans-serif';
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  ctx.fillText(`×${Math.round(count)}`, w - 34, 46);
 }
 
 function animateLoading(time) {
@@ -109,7 +103,6 @@ async function loadData() {
   if (requestController) requestController.abort();
   requestController = new AbortController();
   loadingEl.hidden = false;
-  loadingMessageEl.textContent = "資料載入中...";
   startLoadingAnimation();
   retryButton.hidden = true;
   eventEmptyEl.hidden = true;
@@ -131,7 +124,6 @@ async function loadData() {
   } catch (error) {
     if (error.name === "AbortError") return;
     loadingEl.hidden = false;
-    loadingMessageEl.textContent = "資料載入失敗，請確認網路連線後重試。";
     stopLoadingAnimation();
     retryButton.hidden = false;
   }
