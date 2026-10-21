@@ -16,7 +16,7 @@ const songSearchEl = document.getElementById("songSearch");
 const songCountEl = document.getElementById("songCount");
 const songEmptyEl = document.getElementById("songEmpty");
 
-const defaultSubtitle = "點選一場演出，查看當天的歌曲與影片。";
+const defaultSubtitle = "";
 const dataUrl = "https://script.google.com/macros/s/AKfycbwkV_d1-Jl0dLzQLX5URCgxXecjHNHTxAR0KtcbuCD8piiOqCXDrZIm-6FeegTivinD/exec";
 const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const queryParams = new URLSearchParams(window.location.search);
@@ -71,7 +71,14 @@ function buildEventSongMap(data) {
 function getEvents() {
   const search = eventSearchEl.value.trim().toLocaleLowerCase("zh-TW");
   const events = Array.from(eventSongMap, ([title, songs]) => ({ title, songs, date: parseDate(songs[0]?.date) }));
-  const filtered = events.filter(({ title }) => title.toLocaleLowerCase("zh-TW").includes(search));
+  const filtered = events.filter(({ title, songs }) => {
+    if (!search) return true;
+    const searchable = [title, ...songs.flatMap((song) => {
+      const [mainTitle, inlineArtist] = splitSongTitle(song.song || "");
+      return [mainTitle, inlineArtist, song.artist || ""];
+    })].join(" ").toLocaleLowerCase("zh-TW");
+    return searchable.includes(search);
+  });
   const sort = eventSortEl.value;
 
   filtered.sort((a, b) => {
@@ -89,7 +96,7 @@ function renderEvents() {
   eventCountEl.textContent = `${events.length} 場演出`;
   eventEmptyEl.hidden = events.length > 0;
   if (!events.length) {
-    showEventEmpty(eventSearchEl.value.trim() ? "找不到符合的演出。" : "目前沒有演出資料。");
+    showEventEmpty(eventSearchEl.value.trim() ? "找不到符合的演出、歌曲或歌手。" : "目前沒有演出資料。");
     return;
   }
 
