@@ -11,6 +11,9 @@ const eventSortEl = document.getElementById("eventSort");
 const eventToolsEl = document.getElementById("eventTools");
 const eventCountEl = document.getElementById("eventCount");
 const eventEmptyEl = document.getElementById("eventEmpty");
+const globalSongResultsEl = document.getElementById("globalSongResults");
+const globalSongHeadingEl = document.getElementById("globalSongHeading");
+const globalSongListEl = document.getElementById("globalSongList");
 const eventDetailsEl = document.getElementById("eventDetails");
 const songSearchEl = document.getElementById("songSearch");
 const songCountEl = document.getElementById("songCount");
@@ -69,16 +72,9 @@ function buildEventSongMap(data) {
 }
 
 function getEvents() {
-  const search = eventSearchEl.value.trim().toLocaleLowerCase("zh-TW");
+  const search = normalizeSearch(eventSearchEl.value);
   const events = Array.from(eventSongMap, ([title, songs]) => ({ title, songs, date: parseDate(songs[0]?.date) }));
-  const filtered = events.filter(({ title, songs }) => {
-    if (!search) return true;
-    const searchable = [title, ...songs.flatMap((song) => {
-      const [mainTitle, inlineArtist] = splitSongTitle(song.song || "");
-      return [mainTitle, inlineArtist, song.artist || ""];
-    })].join(" ").toLocaleLowerCase("zh-TW");
-    return searchable.includes(search);
-  });
+  const filtered = events.filter(({ title }) => !search || normalizeSearch(title).includes(search));
   const sort = eventSortEl.value;
 
   filtered.sort((a, b) => {
@@ -92,11 +88,29 @@ function getEvents() {
 
 function renderEvents() {
   eventListEl.textContent = "";
+  globalSongListEl.textContent = "";
+  const query = eventSearchEl.value.trim();
+  const search = normalizeSearch(query);
+  const matchingSongs = search ? getMatchingSongs(search) : [];
+  const hasSongMatches = matchingSongs.length > 0;
+  globalSongResultsEl.hidden = !hasSongMatches;
+  eventListEl.hidden = hasSongMatches;
+  eventCountEl.hidden = hasSongMatches;
+
+  if (hasSongMatches) {
+    eventEmptyEl.hidden = true;
+    globalSongHeadingEl.textContent = `找到 ${matchingSongs.length} 首不重複歌曲`;
+    renderGlobalSongResults(matchingSongs);
+    return;
+  }
+
   const events = getEvents();
+  const isSearching = Boolean(search);
+  eventListEl.hidden = isSearching && events.length === 0;
   eventCountEl.textContent = `${events.length} 場演出`;
   eventEmptyEl.hidden = events.length > 0;
   if (!events.length) {
-    showEventEmpty(eventSearchEl.value.trim() ? "找不到符合的演出、歌曲或歌手。" : "目前沒有演出資料。");
+    showEventEmpty(isSearching ? "找不到符合的演出、歌曲或歌手。" : "目前沒有演出資料。");
     return;
   }
 
@@ -111,6 +125,49 @@ function renderEvents() {
   });
   eventListEl.appendChild(fragment);
   animateEventCards();
+}
+
+function getMatchingSongs(search) {
+  const uniqueSongs = new Map();
+  allData.forEach((song) => {
+    const [title, inlineArtist] = splitSongTitle(song.song || "");
+    const artist = song.artist || inlineArtist;
+    const eventTitle = song.title || "未命名演出";
+    const fields = [title, artist, song.song || ""].map(normalizeSearch);
+    if (!fields.some((field) => field.includes(search))) return;
+
+    const key = `${normalizeSearch(title)}::${normalizeSearch(artist)}`;
+    if (!uniqueSongs.has(key)) {
+      uniqueSongs.set(key, { title, artist, link: song.link || "", eventTitles: new Set() });
+    }
+    uniqueSongs.get(key).eventTitles.add(eventTitle);
+    if (!uniqueSongs.get(key).link && song.link) uniqueSongs.get(key).link = song.link;
+  });
+  return Array.from(uniqueSongs.values());
+}
+
+function renderGlobalSongResults(songs) {
+  const fragment = document.createDocumentFragment();
+  songs.forEach((song) => {
+    const row = document.createElement("tr");
+    const eventTitles = Array.from(song.eventTitles);
+    const eventButtons = eventTitles.map((title) =>
+      `<button class="song-event-link" type="button" data-event-title="${escapeAttribute(title)}">${escapeHtml(title)}</button>`
+    ).join("、");
+    const ytID = extractYouTubeID(song.link);
+    row.innerHTML = `<td class="px-4 py-4 text-center"><div class="song-title">${escapeHtml(song.title)}</div>${song.artist ? `<div class="song-artist">${escapeHtml(song.artist)}</div>` : ""}</td><td class="px-4 py-4 text-center">${eventButtons}</td><td class="px-4 py-4 text-left">${renderThumbnail(song.link, ytID, song.title)}</td>`;
+    fragment.appendChild(row);
+  });
+  globalSongListEl.appendChild(fragment);
+}
+
+globalSongListEl.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-event-title]");
+  if (button) showSongsForEvent(button.dataset.eventTitle, true);
+});
+
+function normalizeSearch(value = "") {
+  return String(value).normalize("NFKC").trim().toLocaleLowerCase("zh-TW");
 }
 
 function showEventEmpty(message) {

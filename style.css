@@ -349,6 +349,29 @@ body {
   font-size: 0.95rem;
 }
 
+.global-song-results {
+  margin-top: 1.5rem;
+}
+
+.global-song-heading {
+  margin: 0 0 1rem;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.song-event-link {
+  padding: 0.2rem 0.35rem;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.song-event-link:hover,
+.song-event-link:focus-visible {
+  color: var(--accent);
+}
+
 .thumbnail-fallback {
   display: inline-flex;
   min-width: 10rem;

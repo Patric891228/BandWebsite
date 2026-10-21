@@ -23,7 +23,7 @@
     <div id="eventPage">
       <div id="eventTools" class="event-tools" hidden>
         <label class="sr-only" for="eventSearch">搜尋演出、歌曲或歌手</label>
-        <input id="eventSearch" type="search" placeholder="搜尋演出、歌曲或歌手" autocomplete="off" />
+        <input id="eventSearch" type="search" placeholder="搜尋演出名稱、歌曲或歌手" autocomplete="off" />
         <label for="eventSort">排序</label>
         <select id="eventSort">
           <option value="date-desc">日期：新到舊</option>
@@ -34,6 +34,21 @@
       <p id="eventCount" class="status-copy" aria-live="polite"></p>
       <div id="eventList" class="grid grid-cols-1 gap-6 justify-center sm:grid-cols-2 md:grid-cols-3"></div>
       <div id="eventEmpty" class="empty-state" hidden></div>
+      <section id="globalSongResults" class="global-song-results" hidden aria-label="全站歌曲搜尋結果">
+        <h2 id="globalSongHeading" class="global-song-heading"></h2>
+        <div class="song-table-shell overflow-x-auto rounded-[24px]">
+          <table class="song-table mx-auto min-w-full bg-white text-lg">
+            <thead>
+              <tr>
+                <th class="px-4 py-4 text-center text-xl">歌曲</th>
+                <th class="px-4 py-4 text-center text-xl">演出場次</th>
+                <th class="px-4 py-4 text-center text-xl sm:text-left">YouTube</th>
+              </tr>
+            </thead>
+            <tbody id="globalSongList" class="divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+      </section>
     </div>
 
     <div id="songPage" class="hidden fade-in-up">
