@@ -5,12 +5,14 @@ const songListEl = document.getElementById("songList");
 const subtitleEl = document.getElementById("subtitle");
 const loadingEl = document.getElementById("loading");
 const loadingCanvas = document.getElementById("loadingAnimation");
+const loadingMessageEl = document.getElementById("loadingMessage");
 const backButton = document.getElementById("backButton");
 const retryButton = document.getElementById("retryButton");
 const eventSearchEl = document.getElementById("eventSearch");
 const eventSortEl = document.getElementById("eventSort");
 const eventToolsEl = document.getElementById("eventTools");
 const eventCountEl = document.getElementById("eventCount");
+const eventSectionTitleEl = document.getElementById("eventSectionTitle");
 const eventEmptyEl = document.getElementById("eventEmpty");
 const globalSongResultsEl = document.getElementById("globalSongResults");
 const globalSongHeadingEl = document.getElementById("globalSongHeading");
@@ -103,6 +105,8 @@ async function loadData() {
   if (requestController) requestController.abort();
   requestController = new AbortController();
   loadingEl.hidden = false;
+  loadingMessageEl.hidden = true;
+  loadingMessageEl.textContent = "";
   startLoadingAnimation();
   retryButton.hidden = true;
   eventEmptyEl.hidden = true;
@@ -117,13 +121,15 @@ async function loadData() {
     eventSongMap = buildEventSongMap(data);
     loadingEl.hidden = true;
     stopLoadingAnimation();
-    eventToolsEl.hidden = eventSongMap.size === 0;
+    eventToolsEl.hidden = true;
     renderEvents();
     if (eventSongMap.size === 0) showEventEmpty("目前沒有演出資料。");
     openEventFromUrl();
   } catch (error) {
     if (error.name === "AbortError") return;
     loadingEl.hidden = false;
+    loadingMessageEl.textContent = "資料載入失敗，請確認網路連線後重試。";
+    loadingMessageEl.hidden = false;
     stopLoadingAnimation();
     retryButton.hidden = false;
   }
@@ -166,6 +172,7 @@ function renderEvents() {
   eventCountEl.hidden = hasSongMatches;
 
   if (hasSongMatches) {
+    eventSectionTitleEl.textContent = "搜尋到的歌曲";
     eventEmptyEl.hidden = true;
     globalSongHeadingEl.textContent = `找到 ${matchingSongs.length} 首不重複歌曲`;
     renderGlobalSongResults(matchingSongs);
@@ -174,6 +181,7 @@ function renderEvents() {
 
   const events = getEvents();
   const isSearching = Boolean(search);
+  eventSectionTitleEl.textContent = isSearching ? "符合的演出場次" : "值得再聽一次的現場";
   eventListEl.hidden = isSearching && events.length === 0;
   eventCountEl.textContent = `${events.length} 場演出`;
   eventEmptyEl.hidden = events.length > 0;
@@ -187,7 +195,7 @@ function renderEvents() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "event-card";
-    card.innerHTML = `<div><h2 class="event-card-title">${escapeHtml(title)}</h2><p class="event-card-date">${escapeHtml(formatDate(songs[0]?.date))}</p></div><p class="event-card-count">${songs.length} 首歌曲</p>`;
+    card.innerHTML = `<span class="event-card-image" aria-hidden="true"><span class="image-placeholder-label">演出照片待提供</span><span class="event-card-badge">LIVE SETLIST</span></span><span class="event-card-body"><span class="event-card-date">${escapeHtml(formatDate(songs[0]?.date))}</span><span class="event-card-title">${escapeHtml(title)}</span><span class="event-card-meta"><span>${songs.length} 首歌曲</span><span class="event-card-arrow" aria-hidden="true">↗</span></span></span>`;
     card.addEventListener("click", () => showSongsForEvent(title, true));
     fragment.appendChild(card);
   });
