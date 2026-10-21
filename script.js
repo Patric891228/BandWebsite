@@ -12,7 +12,6 @@ const eventSearchEl = document.getElementById("eventSearch");
 const eventSortEl = document.getElementById("eventSort");
 const eventToolsEl = document.getElementById("eventTools");
 const eventCountEl = document.getElementById("eventCount");
-const eventSectionTitleEl = document.getElementById("eventSectionTitle");
 const eventEmptyEl = document.getElementById("eventEmpty");
 const globalSongResultsEl = document.getElementById("globalSongResults");
 const globalSongHeadingEl = document.getElementById("globalSongHeading");
@@ -172,7 +171,6 @@ function renderEvents() {
   eventCountEl.hidden = hasSongMatches;
 
   if (hasSongMatches) {
-    eventSectionTitleEl.textContent = "搜尋到的歌曲";
     eventEmptyEl.hidden = true;
     globalSongHeadingEl.textContent = `找到 ${matchingSongs.length} 首不重複歌曲`;
     renderGlobalSongResults(matchingSongs);
@@ -181,7 +179,6 @@ function renderEvents() {
 
   const events = getEvents();
   const isSearching = Boolean(search);
-  eventSectionTitleEl.textContent = isSearching ? "符合的演出場次" : "探索演出現場，重溫每一首歌。";
   eventListEl.hidden = isSearching && events.length === 0;
   eventCountEl.textContent = `${events.length} 場演出`;
   eventEmptyEl.hidden = events.length > 0;
@@ -195,7 +192,7 @@ function renderEvents() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "event-card";
-    card.innerHTML = `<span class="event-card-image" aria-hidden="true"><span class="image-placeholder-label">演出照片待提供</span><span class="event-card-badge">LIVE SETLIST</span></span><span class="event-card-body"><span class="event-card-date">${escapeHtml(formatDate(songs[0]?.date))}</span><span class="event-card-title">${escapeHtml(title)}</span><span class="event-card-meta"><span>${songs.length} 首歌曲</span><span class="event-card-arrow" aria-hidden="true">↗</span></span></span>`;
+    card.innerHTML = `<span class="event-card-image" aria-hidden="true"></span><span class="event-card-body"><span class="event-card-date">${escapeHtml(formatDate(songs[0]?.date))}</span><span class="event-card-title">${escapeHtml(title)}</span><span class="event-card-meta"><span>${songs.length} 首歌曲</span><span class="event-card-arrow" aria-hidden="true">↗</span></span></span>`;
     card.addEventListener("click", () => showSongsForEvent(title, true));
     fragment.appendChild(card);
   });

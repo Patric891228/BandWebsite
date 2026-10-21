@@ -14,24 +14,13 @@
 <body>
   <header class="site-header">
     <a class="brand-mark" href="./" aria-label="樂團演出歌單首頁"><span class="brand-icon">♫</span><span>樂團歌單</span></a>
-    <nav class="main-nav" aria-label="主要導覽">
-      <a class="active" href="#events">探索演出</a>
-      <a href="#globalSongResults">歌曲搜尋</a>
-    </nav>
-    <a class="header-action" href="#events">查看所有場次 <span aria-hidden="true">↗</span></a>
   </header>
 
   <main class="site-main">
-    <section class="hero-panel" aria-labelledby="heroTitle">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-dot"></span> 值得再聽一次的現場</p>
-        <h1 id="heroTitle">下一場，<br /><span>從這首歌開始。</span></h1>
-        <p id="subtitle" class="subtitle-text"></p>
-      </div>
-      <div class="hero-image-placeholder" aria-label="主視覺照片待提供">
+    <section class="hero-panel" aria-label="演出搜尋">
+      <div class="hero-image-placeholder" aria-hidden="true">
         <span class="placeholder-orbit orbit-one"></span><span class="placeholder-orbit orbit-two"></span>
         <span class="placeholder-note">♫</span>
-        <span class="placeholder-caption">主視覺照片<br />待提供</span>
       </div>
       <div class="hero-search-shell">
         <div class="hero-search-icon" aria-hidden="true">⌕</div>
@@ -56,7 +45,6 @@
     <div id="eventPage">
       <div id="eventTools" class="event-tools" hidden></div>
       <div class="section-heading" id="events">
-        <div><p class="eyebrow section-eyebrow">THE SOUNDTRACK OF OUR SHOWS</p><h2 id="eventSectionTitle">探索演出現場，重溫每一首歌。</h2></div>
         <p id="eventCount" class="status-copy" aria-live="polite"></p>
       </div>
       <div id="eventList" class="event-grid"></div>
@@ -82,6 +70,7 @@
       <button id="backButton" type="button" class="back-button mb-6 mx-auto transition-transform duration-300 hover:scale-105">
         返回演出列表
       </button>
+      <h1 id="subtitle" class="event-title"></h1>
       <div id="eventDetails" class="event-details" hidden></div>
       <label class="sr-only" for="songSearch">搜尋歌曲</label>
       <input id="songSearch" class="song-search" type="search" placeholder="搜尋歌曲或歌手" autocomplete="off" />
